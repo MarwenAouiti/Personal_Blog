@@ -46,7 +46,21 @@ class AddPost extends Component {
       )[0];
       this.props.history.push("/admin/posts/edit/" + post.id);
     }
+
+    if (this.props.admin.post.id !== props.admin.post.id) {
+      // fire when redux state change post in admin reducer
+      this.props.setValues(this.props.admin.post);
+    }
   }
+  componentDidMount(props, state) {
+    if (this.props.match.params.view === "edit" && this.props.match.params.id) {
+      this.props.getSinglePost(
+        this.props.match.params.id,
+        this.props.auth.token
+      );
+    }
+  }
+
   render() {
     const { classes } = this.props;
     return (
@@ -109,6 +123,9 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   addPost: (post, token) => {
     dispatch(AdminActions.addPost(post, token));
+  },
+  getSinglePost: (id, token) => {
+    dispatch(AdminActions.getSinglePost(id, token));
   }
 });
 
@@ -118,12 +135,12 @@ export default withRouter(
     mapDispatchToProps
   )(
     withFormik({
-      mapPropsToValues: () => ({
-        title: "",
-        slug: "",
-        createdAt: "",
-        status: false,
-        content: ""
+      mapPropsToValues: props => ({
+        title: props.admin.post.title || "",
+        slug: props.admin.post.slug || "",
+        createdAt: props.admin.post.createdAt || "",
+        status: props.admin.post.status || false,
+        content: props.admin.post.content || ""
       }),
       validationSchema: Yup.object().shape({
         title: Yup.string().required("Title is required!!"),
