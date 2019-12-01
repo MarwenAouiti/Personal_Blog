@@ -2,6 +2,9 @@ import axios from "axios";
 
 const host = "http://localhost:3001";
 const API = {
+  makeFileUrl: (url, token) => {
+    return host + url + "?access_token=" + token;
+  },
   login: (email, pass, success) => {
     axios
       .post(`${host}/api/users/login`, { email: email, password: pass })
@@ -24,10 +27,33 @@ const API = {
       success(res);
     });
   },
+  updatePost: (post, token, success) => {
+    axios
+      .patch(`${host}/api/Posts/${post.id}?access_token=${token}`, post)
+      .then(res => {
+        success(res);
+      });
+  },
   getSinglePost: (id, token, success) => {
-    axios.get(`${host}/api/Posts/${id}?access_token=${token}`).then(res => {
-      success(res);
-    });
+    axios
+      .get(`${host}/api/Posts/${id}?access_token=${token}`, {
+        params: {
+          filter: { include: "PostImage" }
+        }
+      })
+      .then(res => {
+        success(res);
+      });
+  },
+  uploadImage: (data, token, postId, userId, success) => {
+    axios
+      .post(
+        `${host}/api/PostImages/upload?post_id=${postId}&access_token=${token}&user_id=${userId}`,
+        data
+      )
+      .then(res => {
+        success(res);
+      });
   }
 };
 

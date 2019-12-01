@@ -8,13 +8,19 @@ import * as Yup from "yup";
 import { FormikTextField, FormikSelectField } from "formik-material-fields";
 import Button from "@material-ui/core/Button";
 import SaveIcon from "@material-ui/icons/Save";
+import ImageIcon from "@material-ui/icons/Image";
 import { withRouter } from "react-router-dom";
+import API from "../../../utils/api";
 
+/* global $ */
 const styles = theme => ({
   container: {
     margin: theme.spacing.unit * 3,
     display: "flex",
     flexDirection: "row wrap",
+    width: "100%"
+  },
+  postImage: {
     width: "100%"
   },
   formControl: {
@@ -31,6 +37,9 @@ const styles = theme => ({
     height: "100%",
     margin: theme.spacing.unit * 1,
     padding: theme.spacing.unit * 3
+  },
+  Save: {
+    marginBottom: theme.spacing.unit * 2
   }
 });
 
@@ -52,6 +61,21 @@ class AddPost extends Component {
       this.props.setValues(this.props.admin.post);
     }
   }
+
+  uploadImage = e => {
+    const data = new FormData();
+    data.append(
+      "file",
+      e.target.files[0],
+      new Date().getTime().toString() + e.target.files[0].name
+    );
+    this.props.uploadImage(
+      data,
+      this.props.auth.token,
+      this.props.admin.post.id,
+      this.props.auth.user.userId
+    );
+  };
   componentDidMount(props, state) {
     if (this.props.match.params.view === "edit" && this.props.match.params.id) {
       this.props.getSinglePost(
@@ -98,16 +122,47 @@ class AddPost extends Component {
               ]}
               fullWidth
             />
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={e => {
-                this.props.handleSubmit();
-              }}
-            >
-              <SaveIcon />
-              Save
-            </Button>
+            <div className={classes.Save}>
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={e => {
+                  this.props.handleSubmit();
+                }}
+              >
+                <SaveIcon />
+                Save
+              </Button>
+            </div>
+            {this.props.admin.post.PostImage ? (
+              this.props.admin.post.PostImage.length > 0 ? (
+                <img
+                  src={API.makeFileUrl(
+                    this.props.admin.post.PostImage[0].url,
+                    this.props.auth.token
+                  )}
+                  className={classes.postImage}
+                  alt="postimagepiw"
+                />
+              ) : null
+            ) : null}
+            <div>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={e => {
+                  $(".MyFile").trigger("click");
+                }}
+              >
+                <ImageIcon /> Upload post image
+              </Button>
+              <input
+                type="file"
+                style={{ display: "none" }}
+                className="MyFile"
+                onChange={this.uploadImage}
+              />
+            </div>
           </Paper>
         </Form>
       </div>
@@ -124,8 +179,14 @@ const mapDispatchToProps = dispatch => ({
   addPost: (post, token) => {
     dispatch(AdminActions.addPost(post, token));
   },
+  updatePost: (post, token) => {
+    dispatch(AdminActions.updatePost(post, token));
+  },
   getSinglePost: (id, token) => {
     dispatch(AdminActions.getSinglePost(id, token));
+  },
+  uploadImage: (data, token, postId, userId) => {
+    dispatch(AdminActions.uploadImage(data, token, postId, userId));
   }
 });
 
@@ -149,7 +210,15 @@ export default withRouter(
       }),
       handleSubmit: (values, { setSubmitting, props }) => {
         console.log("Saving....!", props.addPost);
-        props.addPost(values, props.auth.token);
+        if (props.match.params.view === "edit") {
+          const post = {
+            ...values,
+            id: props.match.params.id
+          };
+          props.updatePost(post, props.auth.token);
+        } else {
+          props.addPost(values, props.auth.token);
+        }
       }
     })(withStyles(styles)(AddPost))
   )
