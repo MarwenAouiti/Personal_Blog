@@ -9,6 +9,8 @@ import About from "./components/pages/About";
 import Contact from "./components/pages/Contact";
 import AdminWrapper from "./components/AdminWrapper";
 import Login from "./components/pages/Login";
+import Blog from "./components/pages/Blog";
+import Single from "./components/pages/Single";
 
 // Admin Pages
 import Dashboard from "./components/pages/Admin/Dashboard";
@@ -128,8 +130,28 @@ class App extends Component {
               </PageWrapper>
             )}
           />
+
+          <Route
+            path="/blog/:slug"
+            exact={true}
+            render={props => (
+              <PageWrapper>
+                <Single {...props} />
+              </PageWrapper>
+            )}
+          />
+          <Route
+            path="/blog"
+            exact={true}
+            render={props => (
+              <PageWrapper>
+                <Blog {...props} />
+              </PageWrapper>
+            )}
+          />
           <Route
             path="/about"
+            exact={true}
             render={props => (
               <PageWrapper>
                 <About {...props} />
@@ -138,6 +160,7 @@ class App extends Component {
           />
           <Route
             path="/contact"
+            exact={true}
             render={props => (
               <PageWrapper>
                 <Contact {...props} />

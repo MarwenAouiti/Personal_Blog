@@ -17,10 +17,31 @@ const API = {
       success(res);
     });
   },
+  getPostCount: success => {
+    axios.get(`${host}/api/Posts/count`).then(res => {
+      success(res);
+    });
+  },
   getPosts: (token, success) => {
     axios.get(`${host}/api/Posts?access_token=${token}`).then(res => {
       success(res);
     });
+  },
+  getSitePosts: (skip, success) => {
+    axios
+      .get(`${host}/api/Posts`, {
+        params: {
+          filter: {
+            skip: skip,
+            limit: 5,
+            include: "PostImage",
+            fields: { id: true, title: true, slug: true, content: false }
+          }
+        }
+      })
+      .then(res => {
+        success(res);
+      });
   },
   addPost: (post, token, success) => {
     axios.post(`${host}/api/Posts?access_token=${token}`, post).then(res => {

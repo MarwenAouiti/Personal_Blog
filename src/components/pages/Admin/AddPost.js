@@ -11,7 +11,8 @@ import SaveIcon from "@material-ui/icons/Save";
 import ImageIcon from "@material-ui/icons/Image";
 import { withRouter } from "react-router-dom";
 import API from "../../../utils/api";
-
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 /* global $ */
 const styles = theme => ({
   container: {
@@ -85,6 +86,35 @@ class AddPost extends Component {
     }
   }
 
+  modules = {
+    toolbar: [
+      ["bold", "italic", "underline", "strike"],
+      [{ header: 1 }, { header: 2 }],
+      [{ list: "ordered" }, { list: "bullet" }],
+      [{ indent: "-1" }, { indent: "+1" }],
+      [{ size: ["small", "medium", "large", "huge"] }],
+      [{ color: [] }, { background: [] }],
+      ["image"],
+      ["clean"]
+    ]
+  };
+
+  formats = [
+    "header",
+    "bold",
+    "italic",
+    "underline",
+    "strike",
+    "blockquote",
+    "script",
+    "list",
+    "bullet",
+    "indent",
+    "link",
+    "image",
+    "color",
+    "code-block"
+  ];
   render() {
     const { classes } = this.props;
     return (
@@ -104,11 +134,14 @@ class AddPost extends Component {
               fullWidth
             />
             <FormikTextField name="slug" label="Slug" margin="normal" />
-            <FormikTextField
-              name="content"
-              label="Content"
-              margin="normal"
-              fullWidth
+            <ReactQuill
+              value={this.props.values.content}
+              modules={this.modules}
+              formats={this.formats}
+              placeholder="Write some cool stuff!"
+              onChange={val => {
+                this.props.setFieldValue("content", val);
+              }}
             />
           </Paper>
           <Paper className={classes.rightSide}>
