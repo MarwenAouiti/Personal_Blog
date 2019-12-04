@@ -1,6 +1,11 @@
 import React, { Component } from "react";
 import PageWrapper from "./components/PageWrapper";
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Link,
+  Redirect
+} from "react-router-dom";
 import { connect } from "react-redux";
 
 // Pages
@@ -11,6 +16,7 @@ import AdminWrapper from "./components/AdminWrapper";
 import Login from "./components/pages/Login";
 import Blog from "./components/pages/Blog";
 import Single from "./components/pages/Single";
+import Signup from "./components/pages/Signup";
 
 // Admin Pages
 import Dashboard from "./components/pages/Admin/Dashboard";
@@ -98,6 +104,21 @@ class App extends Component {
                   )}
                 </div>
               );
+            }}
+          />
+          <Route
+            exact={true}
+            path="/signup"
+            render={props => {
+              if (this.props.auth.token) {
+                return <Redirect to="/" />;
+              } else {
+                return (
+                  <LoginWrapper>
+                    <Signup />
+                  </LoginWrapper>
+                );
+              }
             }}
           />
           <Route

@@ -12,6 +12,16 @@ const API = {
         success(res);
       });
   },
+  register: (name, email, pass, success) => {
+    axios
+      .post(`${host}/api/users`, { name: name, email: email, password: pass })
+      .then(res => {
+        success(res);
+      })
+      .catch(err => {
+        success(err);
+      });
+  },
   getUsers: (token, success) => {
     axios.get(`${host}/api/users?access_token=${token}`).then(res => {
       success(res);
@@ -72,6 +82,21 @@ const API = {
         `${host}/api/PostImages/upload?post_id=${postId}&access_token=${token}&user_id=${userId}`,
         data
       )
+      .then(res => {
+        success(res);
+      });
+  },
+  getPostBySlug: (slug, token, success) => {
+    axios
+      .get(`${host}/api/Posts/findOne?access_token=${token}`, {
+        params: {
+          filter: {
+            where: {
+              slug: slug
+            }
+          }
+        }
+      })
       .then(res => {
         success(res);
       });
