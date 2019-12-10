@@ -3,6 +3,8 @@ import { connect } from "react-redux";
 import Header from "../common/Header";
 import API from "../../utils/api";
 import * as siteActions from "../../store/actions/siteActions";
+import { Link } from "react-router-dom";
+import CommentBuilder from "../common/CommentBuilder";
 
 class Single extends Component {
   componentDidMount() {
@@ -19,11 +21,13 @@ class Single extends Component {
           subtitle={this.props.site.post.title}
           showButton={false}
           image={
-            this.props.site.post.PostImage.length > 0
-              ? API.makeFileUrl(
-                  this.props.site.post.PostImage[0].url,
-                  this.props.auth.token
-                )
+            this.props.site.post.PostImage
+              ? this.props.site.post.PostImage.length > 0
+                ? API.makeFileUrl(
+                    this.props.site.post.PostImage[0].url,
+                    this.props.auth.token
+                  )
+                : ""
               : ""
           }
         />
@@ -37,6 +41,32 @@ class Single extends Component {
                 }}
               ></div>
             </div>
+          </div>
+          <div className="row">
+            <div className="col-md-12">
+              <h3>Comments</h3>
+              {this.props.auth.token ? (
+                <CommentBuilder />
+              ) : (
+                <p>
+                  Need an account? <Link to="/signup">Sign Up</Link>{" "}
+                </p>
+              )}
+            </div>
+          </div>
+          <div className="row">
+            {this.props.site.post.Comments
+              ? this.props.site.post.Comments.length > 0
+                ? this.props.site.post.Comments.map((comment, i) => {
+                    return (
+                      <div className="col-md-12">
+                        <h4>{comment.Profile ? comment.Profile.name : ""}</h4>
+                        <p>{comment.content}</p>
+                      </div>
+                    );
+                  })
+                : null
+              : null}
           </div>
         </div>
       </div>

@@ -1,6 +1,12 @@
 import axios from "axios";
 
-const host = "http://localhost:3001";
+let host;
+if (process.env.NODE_ENV === "development") {
+  host = "http://localhost:3001";
+} else {
+  host = "http://demoapi.marwen.com";
+}
+
 const API = {
   makeFileUrl: (url, token) => {
     return host + url + "?access_token=" + token;
@@ -8,6 +14,19 @@ const API = {
   login: (email, pass, success) => {
     axios
       .post(`${host}/api/users/login`, { email: email, password: pass })
+      .then(res => {
+        success(res);
+      });
+  },
+  getUser: (userId, token, success) => {
+    axios
+      .get(`${host}/api/users/${userId}?access_token=${token}`, {
+        params: {
+          filter: {
+            include: "Profile"
+          }
+        }
+      })
       .then(res => {
         success(res);
       });
@@ -93,7 +112,34 @@ const API = {
           filter: {
             where: {
               slug: slug
-            }
+            },
+            include: { Comments: "Profile" }
+          }
+        }
+      })
+      .then(res => {
+        success(res);
+      });
+  },
+  getCommentById: (commentId, token, success) => {
+    axios
+      .get(`${host}/api/Comments/${commentId}?access_token=${token}`, {
+        params: {
+          filter: {
+            include: "Profile"
+          }
+        }
+      })
+      .then(res => {
+        success(200);
+      });
+  },
+  postComment: (comment, token, success) => {
+    axios
+      .post(`${host}/api/Comments?access_token=${token}`, comment, {
+        params: {
+          filter: {
+            include: "Profile"
           }
         }
       })

@@ -7,6 +7,12 @@ export const login = (email, pass) => {
         type: "LOGIN",
         payload: { email: email, token: res.data.id, userId: res.data.userId }
       });
+      API.getUser(res.data.userId, res.data.id, res2 => {
+        dispatch({
+          type: "AFTER_LOGIN",
+          payload: res2.data
+        });
+      });
     });
   };
   /*return {
